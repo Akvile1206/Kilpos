@@ -76,6 +76,63 @@ function isClose(A, B, C, epsilon) {
     return (length(C, point) <= epsilon);
 }
 
+function DrawCurveAndReturnLineArray(Points, ctx) {
+    if(isClose(Points[0], Points[3], Points[1], 0.5) && isClose(Points[0], Points[3], Points[2], 0.5)) {
+        DrawLine(ctx, Points[0], Points[3]);
+        return [{A: Points[0], B:Points[3]}];
+    } else {
+        var subdivision = subdivide(Points);
+        var toReturn = [];
+        toReturn.push(...DrawCurveAndReturnLineArray(subdivision.left, ctx));
+        toReturn.push(...DrawCurveAndReturnLineArray(subdivision.right, ctx));
+        return toReturn;
+    }
+}
+
+function linesIntersect (lineP, lineQ) {
+    var PBminusPAT = new Point(lineP.A.y - lineP.B.y, lineP.B.x - lineP.A.x);
+    var QAminusPA = new Point(lineQ.A.x - lineP.A.x, lineQ.A.y - lineP.A.y);
+    var firstDot = PBminusPAT.x*QAminusPA.x + PBminusPAT.y*QAminusPA.y;
+    var QBminusPA = new Point(lineQ.B.x - lineP.A.x, lineQ.B.y - lineP.A.y);
+    var secondDot = PBminusPAT.x*QBminusPA.x + PBminusPAT.y*QBminusPA.y;
+    if(firstDot*secondDot > 0 || firstDot*secondDot === 0) {
+        return false;
+    }
+    var QBminusQAT = new Point(lineQ.A.y - lineQ.B.y, lineQ.B.x - lineQ.A.x);
+    var PAminusQA = new Point(lineP.A.x - lineQ.A.x, lineP.A.y - lineQ.A.y);
+    firstDot = QBminusQAT.x*PAminusQA.x + QBminusQAT.y*PAminusQA.y;
+    var PBminusQA = new Point(lineP.B.x - lineQ.A.x, lineP.B.y - lineQ.A.y);
+    secondDot = QBminusQAT.x*PBminusQA.x + QBminusQAT.y*PBminusQA.y;
+    if(firstDot*secondDot >= 0 || firstDot*secondDot === 0) {
+        return false;
+    }
+    return true;
+}
+
+function atLeastOneLineIntersect(lines, line) {
+    for (var i = 0; i < lines.length; i++) {
+        if(linesIntersect(lines[i], line)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function DrawCurveAndCheckIntersection(Points, ctx, lines) {
+    if(isClose(Points[0], Points[3], Points[1], 0.5) && isClose(Points[0], Points[3], Points[2], 0.5)) {
+        DrawLine(ctx, Points[0], Points[3]);
+        return atLeastOneLineIntersect(lines, {A:Points[0], B:Points[3]});
+    } else {
+        var subdivision = subdivide(Points);
+        if (DrawCurveAndCheckIntersection(subdivision.left, ctx, lines)) {
+            DrawCurve(subdivision.right, ctx);
+            return true;
+        } else if (DrawCurveAndCheckIntersection(subdivision.right, ctx, lines)) {
+            return true;
+        }
+    }
+}
+
 function DrawCurve(Points, ctx) {
     if(isClose(Points[0], Points[3], Points[1], 0.5) && isClose(Points[0], Points[3], Points[2], 0.5)) {
         DrawLine(ctx, Points[0], Points[3]);
@@ -89,12 +146,28 @@ function DrawCurve(Points, ctx) {
 function DrawBezier(Points, ctx) {
     var length = Points.length;
     if (Points.length < 4) {
-        throw "Four points are required for a cubic bezier!";
+        for(var i=0; i<length-1; i++) {
+            DrawLine(ctx, Points[i], Points[i+1]);
+        }
+        return;
     }
-    for(var i = 0; i < length - 3; i++) {
+    var tailLine = {A:Points[0], B:Points[1]};
+    DrawLine(ctx, Points[0], Points[1]);
+    var headLine = {A:Points[length-2], B:Points[length-1]};
+    DrawLine(ctx, Points[length-2], Points[length-1]);
+    
+    var lastBezierPoints = createOverhauser(Points[length - 4], Points[length - 3], Points[length - 2], Points[length - 1]);
+    var lastBezier = DrawCurveAndReturnLineArray(lastBezierPoints, ctx);
+    var intersects = atLeastOneLineIntersect(lastBezier, headLine);
+    lastBezier.push(headLine);
+    intersects = intersects || atLeastOneLineIntersect(lastBezier, tailLine);
+    for(var i = 0; i < length - 4; i++) {
         var OPoints = createOverhauser(Points[i], Points[i+1], Points[i+2], Points[i+3]);
-        DrawCurve(OPoints, ctx);
+        if(DrawCurveAndCheckIntersection(OPoints, ctx, lastBezier)) {
+            intersects = true;
+        }
     }
+    return intersects;
 }
 
 export{DrawBezier};
