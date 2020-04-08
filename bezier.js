@@ -170,4 +170,4 @@ function DrawBezier(Points, ctx) {
     return intersects;
 }
 
-export{DrawBezier};
+export{DrawBezier, isClose};
