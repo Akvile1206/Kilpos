@@ -92,13 +92,16 @@ function restart() {
     snakeLength = 4;
     collectedPoints = [];
     collectedPoints.push(playerHead);
-    start = true;
     for(var i=0; i<64; i++) {
         Math.random();
         var P = new Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
         Points.push(P);
     }
     pickApple(Points);
+    if(!start) {
+        start = true;
+        window.requestAnimationFrame(draw);
+    }
 }
 
 function init() {
@@ -123,10 +126,7 @@ function init() {
             rotatePLayerDir(Math.PI/25);
         }
       });
-    if(start) {
-        window.requestAnimationFrame(draw);
-    }
-    
+    window.requestAnimationFrame(draw);
 }
 
 function draw() {
