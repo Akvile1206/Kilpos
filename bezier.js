@@ -145,7 +145,37 @@ function DrawCurve(Points, ctx) {
 
 function DrawBezier(Points, ctx) {
     var length = Points.length;
-    if (Points.length < 4) {
+    if (Points.length <= 4) {
+        for(var i=0; i<length-1; i++) {
+            DrawLine(ctx, Points[i], Points[i+1]);
+        }
+        return;
+    }
+    
+    var lastBezier = [];
+    if(length%2 == 1) {
+        var headLine = {A:Points[length-2], B:Points[length-1]};
+        DrawLine(ctx, Points[length-2], Points[length-1]);
+        lastBezier = [headLine];
+    } else {
+        var lastBezierPoints = [Points[length - 3], reflect(Points[length - 3],Points[length - 4]), Points[length - 2], Points[length - 1]];
+        lastBezier = DrawCurveAndReturnLineArray(lastBezierPoints, ctx);
+        length--;
+    }
+    var OPoints = [Points[0], Points[1], Points[2], Points[3]];
+    var intersects = DrawCurveAndCheckIntersection(OPoints, ctx, lastBezier)
+    for(var i = 4; i < length - 1; i+=2) {
+        var OPoints = [Points[i-1], reflect(Points[i-1],Points[i-2]), Points[i], Points[i+1]];
+        if(DrawCurveAndCheckIntersection(OPoints, ctx, lastBezier)) {
+            intersects = true;
+        }
+    }
+    return intersects;
+}
+
+function DrawBezierInterpolating(Points, ctx) {
+    var length = Points.length;
+    if (Points.length <= 4) {
         for(var i=0; i<length-1; i++) {
             DrawLine(ctx, Points[i], Points[i+1]);
         }
@@ -161,7 +191,7 @@ function DrawBezier(Points, ctx) {
     var intersects = atLeastOneLineIntersect(lastBezier, headLine);
     lastBezier.push(headLine);
     intersects = intersects || atLeastOneLineIntersect(lastBezier, tailLine);
-    for(var i = 0; i < length - 4; i++) {
+    for(var i = 0; i < length - 4; i+=1) {
         var OPoints = createOverhauser(Points[i], Points[i+1], Points[i+2], Points[i+3]);
         if(DrawCurveAndCheckIntersection(OPoints, ctx, lastBezier)) {
             intersects = true;
@@ -170,4 +200,8 @@ function DrawBezier(Points, ctx) {
     return intersects;
 }
 
-export{DrawBezier, isClose};
+function reflect(A,B) {
+    return new Point(2*A.x - B.x, 2*A.y - B.y, 2);
+}
+
+export{DrawBezier, DrawBezierInterpolating, isClose};

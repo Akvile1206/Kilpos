@@ -5,14 +5,13 @@ fitToContainer(canvas);
 var ctx = canvas.getContext("2d");
 var scoreElement = document.getElementById("score");
 
-var Points = [];
-
 function Point(x, y, w) {
     this.x = x;
     this.y = y;
     this.w = w;
 }
 
+var Points = [];
 var playerHead = new Point(300,300,3);
 var playerDirection = new Point(1,0,1);
 var score = 0;
@@ -20,19 +19,26 @@ var velocity = 0.7;
 var snakeLength = 4;
 var collectedPoints = [];
 collectedPoints.push(playerHead);
-
 var start = true;
+var level = 1;
 
-var mouseX = 0;
-var mouseY = 0;
- 
-canvas.addEventListener("mousemove", setMousePosition, false);
+document.getElementById("restart").onclick = function() {
+    restart();
+} 
 
-var canvasPos = getPosition(canvas);
-function setMousePosition(e) {
-    mouseX = e.clientX - canvasPos.x;
-    mouseY = e.clientY - canvasPos.y;
-}
+document.getElementById("level1").onclick = function() {
+    if(level != 1) {
+        level = 1;
+        restart();
+    }
+} 
+
+document.getElementById("level2").onclick = function() {
+    if(level != 2) {
+        level = 2;
+        restart();
+    }
+} 
 
 function intersect() {
     var new_Points = [];
@@ -75,6 +81,24 @@ function rotatePLayerDir(angle) {
     var x = cos*playerDirection.x - sin*playerDirection.y;
     var y = sin*playerDirection.x + cos*playerDirection.y; 
     playerDirection = new Point(x,y,1);
+}
+
+function restart() {
+    Points = [];
+    playerHead = new Point(300,300,3);
+    playerDirection = new Point(1,0,1);
+    score = 0;
+    velocity = 0.7;
+    snakeLength = 4;
+    collectedPoints = [];
+    collectedPoints.push(playerHead);
+    start = true;
+    for(var i=0; i<64; i++) {
+        Math.random();
+        var P = new Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
+        Points.push(P);
+    }
+    pickApple(Points);
 }
 
 function init() {
@@ -132,7 +156,15 @@ function draw() {
     var points = [...collectedPoints];
     points.push(playerHead);
     ctx.lineWidth = 3;
-    var intersects = bezier.DrawBezier(points, ctx);
+    var intersects;
+    switch (level) {
+        case 1:
+            intersects = bezier.DrawBezierInterpolating(points, ctx);
+            break;
+        case 2:
+            intersects = bezier.DrawBezier(points,ctx);
+            break;
+    }
     if(intersects) {
         start = false;
         alert("self intersection!")
