@@ -92,8 +92,35 @@ function rotatePLayerDir(angle) {
     playerDirection = new geometry.Point(x,y,1);
 }
 
-function restart() {
+function generatePoints(n, r) {
     Points = [];
+    Points.push(playerHead);
+    for(var i=0; i<n; i++) {
+        Math.random();
+        var x = Math.random()*(canvas.width - 100) + 50;
+        var y = Math.random()*(canvas.width - 100) + 50;
+        var w = 2;
+        if(level == 4) { //NURBS
+            w = Math.random()*3+2
+        }
+        var P = new geometry.Point(x,y, w);
+        var valid_point = true;
+        for(var j=0; j<Points.length; j++){
+            if(geometry.length(Points[j], P)<= Points[j].w + r) {
+                valid_point = false;
+                break;
+            }
+        }
+        if(!valid_point) {
+            i--;
+            continue;
+        }
+        Points.push(P);
+    }
+    Points.shift();
+}
+
+function restart() {
     playerHead = new geometry.Point(300,300,3);
     playerDirection = new geometry.Point(1,0,1);
     score = 0;
@@ -101,15 +128,7 @@ function restart() {
     snakeLength = 4;
     collectedPoints = [];
     collectedPoints.push(playerHead);
-    for(var i=0; i<64; i++) {
-        Math.random();
-        var w = 2;
-        if(level == 4) { //NURBS
-            w = Math.random()*3+2
-        }
-        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, w);
-        Points.push(P);
-    }
+    generatePoints(64, 15);
     pickApple(Points);
     if(!start) {
         start = true;
@@ -118,16 +137,7 @@ function restart() {
 }
 
 function init() {
-    //generate random points
-    for(var i=0; i<64; i++) {
-        Math.random();
-        var w = 2;
-        if(level == 4) { //NURBS
-            w = Math.random()*3+2
-        }
-        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, w);
-        Points.push(P);
-    }
+    generatePoints(64, 15);
     pickApple(Points);
     window.addEventListener("keypress", function (event){ 
         var key = event.key;
