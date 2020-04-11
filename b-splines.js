@@ -1,7 +1,7 @@
 import * as geometry from "./geometry.js";
 var k = 4;
 
-function drawSpline(points, ctx) {
+function drawSpline(points, ctx, isNURBS) {
     var n = points.length - 1;
     var intersects = false;
     var lines=[];
@@ -16,10 +16,10 @@ function drawSpline(points, ctx) {
         return geometry.atLeastOneLineIntersect(lines, headLine);
     }
     var knots = createKnot(k, n);
-    var from = getPoint(points,knots,n,knots[k-1]);
+    var from = getPoint(points,knots,n,knots[k-1], isNURBS);
     var to;
     for(var t = knots[k-1] + 0.05; t<=knots[n]; t+=0.05) {
-        to = getPoint(points,knots,n,t);
+        to = getPoint(points,knots,n,t, isNURBS);
         lines.push(new geometry.Line(from, to));
         geometry.DrawLine(ctx, from, to);
         from = to;
@@ -30,12 +30,20 @@ function drawSpline(points, ctx) {
     return geometry.atLeastOneLineIntersect(lines, headLine);
 }
 
-function getPoint(points, knots, n, t) {
+function getPoint(points, knots, n, t, isNURBS) {
     var point = new geometry.Point(0,0,0);
     for(var i = 0; i<n; i++) {
         var weight = N(i+1, k, knots, t);
+        if(isNURBS){
+            weight = weight * points[i].w;
+        }
         point.x += weight*points[i].x;
         point.y += weight*points[i].y;
+        point.w += weight;
+    }
+    if(isNURBS) {
+        point.x /= point.w;
+        point.y /= point.w;
     }
     return point;
 }

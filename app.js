@@ -192,7 +192,10 @@ function draw() {
             intersects = bezier.DrawBezier(points,ctx);
             break;
         case 3: 
-            intersects = splines.drawSpline(points,ctx);
+            intersects = splines.drawSpline(points,ctx,false);
+            break;
+        case 4: 
+            intersects = splines.drawSpline(points,ctx,true);
             break;
     }
     if(intersects) {
