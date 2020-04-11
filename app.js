@@ -1,19 +1,15 @@
 import * as bezier from "./bezier.js";
+import * as splines from "./b-splines.js";
+import * as geometry from "./geometry.js";
 
 var canvas = document.getElementById("canvas");
 fitToContainer(canvas);
 var ctx = canvas.getContext("2d");
 var scoreElement = document.getElementById("score");
 
-function Point(x, y, w) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-}
-
 var Points = [];
-var playerHead = new Point(300,300,3);
-var playerDirection = new Point(1,0,1);
+var playerHead = new geometry.Point(300,300,3);
+var playerDirection = new geometry.Point(1,0,1);
 var score = 0;
 var velocity = 0.7;
 var snakeLength = 4;
@@ -40,12 +36,18 @@ document.getElementById("level2").onclick = function() {
     }
 } 
 
+document.getElementById("level3").onclick = function() {
+    if(level != 3) {
+        level = 3;
+        restart();
+    }
+} 
+
 function intersect() {
     var new_Points = [];
     var hit_apple = false; 
     for(var i = 0; i<Points.length; i++) {
-        //var playerToPoint = new Point(Points[i].x - playerHead.x, Points[i].y - playerHead.y);
-        if(bezier.isClose(collectedPoints[collectedPoints.length-1], playerHead, Points[i], Points[i].w)) {
+        if(geometry.isClose(collectedPoints[collectedPoints.length-1], playerHead, Points[i], Points[i].w)) {
             collectedPoints.push(Points[i]);
             if(Points[i].apple != undefined) {
                 Points[i].apple = undefined;
@@ -80,13 +82,13 @@ function rotatePLayerDir(angle) {
     var cos = Math.cos(angle);
     var x = cos*playerDirection.x - sin*playerDirection.y;
     var y = sin*playerDirection.x + cos*playerDirection.y; 
-    playerDirection = new Point(x,y,1);
+    playerDirection = new geometry.Point(x,y,1);
 }
 
 function restart() {
     Points = [];
-    playerHead = new Point(300,300,3);
-    playerDirection = new Point(1,0,1);
+    playerHead = new geometry.Point(300,300,3);
+    playerDirection = new geometry.Point(1,0,1);
     score = 0;
     velocity = 0.7;
     snakeLength = 4;
@@ -94,7 +96,7 @@ function restart() {
     collectedPoints.push(playerHead);
     for(var i=0; i<64; i++) {
         Math.random();
-        var P = new Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
+        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
         Points.push(P);
     }
     pickApple(Points);
@@ -108,7 +110,7 @@ function init() {
     //generate random points
     for(var i=0; i<64; i++) {
         Math.random();
-        var P = new Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
+        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
         Points.push(P);
     }
     pickApple(Points);
@@ -130,7 +132,7 @@ function init() {
 }
 
 function draw() {
-    playerHead = new Point(playerHead.x + velocity*playerDirection.x, playerHead.y + velocity*playerDirection.y, playerHead.w);
+    playerHead = new geometry.Point(playerHead.x + velocity*playerDirection.x, playerHead.y + velocity*playerDirection.y, playerHead.w);
     intersect();
 
     //draw
@@ -163,6 +165,9 @@ function draw() {
             break;
         case 2:
             intersects = bezier.DrawBezier(points,ctx);
+            break;
+        case 3: 
+            intersects = splines.drawSpline(points,ctx);
             break;
     }
     if(intersects) {
