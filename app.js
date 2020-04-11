@@ -43,6 +43,13 @@ document.getElementById("level3").onclick = function() {
     }
 } 
 
+document.getElementById("level4").onclick = function() {
+    if(level != 4) {
+        level = 4;
+        restart();
+    }
+}
+
 function intersect() {
     var new_Points = [];
     var hit_apple = false; 
@@ -96,7 +103,11 @@ function restart() {
     collectedPoints.push(playerHead);
     for(var i=0; i<64; i++) {
         Math.random();
-        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
+        var w = 2;
+        if(level == 4) { //NURBS
+            w = Math.random()*3+2
+        }
+        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, w);
         Points.push(P);
     }
     pickApple(Points);
@@ -110,7 +121,11 @@ function init() {
     //generate random points
     for(var i=0; i<64; i++) {
         Math.random();
-        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, 2);
+        var w = 2;
+        if(level == 4) { //NURBS
+            w = Math.random()*3+2
+        }
+        var P = new geometry.Point(Math.random()*(canvas.width - 100) + 50, Math.random()*(canvas.height - 100) + 50, w);
         Points.push(P);
     }
     pickApple(Points);
