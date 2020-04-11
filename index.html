@@ -8,23 +8,46 @@
           height: 600;
           border: 1px solid lightgray;
         }
+        .column {
+          float: left;
+          padding: 10px;
+        }
+
+        .row:after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+
+        .left {
+           width: 25%;
+        }
+
+        .right {
+          width: 25%;
+        }
       </style>
     </head>
     <body>
-        <h2>Kilpos</h2>
-        <input type="radio" id="level1" name="levels" checked>
-        <label for="level1">Level 1 (Overhauser cubic)</label><br>
-        <input type="radio" id="level2" name="levels">
-        <label for="level2">Level 2 (Bezier)</label><br>
-        <input type="radio" id="level3" name="levels">
-        <label for="level3">Level 3 (B-splines)</label><br>
-        <input type="radio" id="level4" name="levels">
-        <label for="level4">Level 4 (NURBS)</label><br>
-        <button type="button" id="restart">Restart</button>
-        <div id = "scene" > 
-            <canvas id="canvas"></canvas>
+        <div class="row">
+            <div class="column">
+                <h2>Kilpos</h2>
+                <input type="radio" id="level1" name="levels" checked>
+                <label for="level1">Level 1 (Overhauser cubic)</label><br>
+                <input type="radio" id="level2" name="levels">
+                <label for="level2">Level 2 (Bezier)</label><br>
+                <input type="radio" id="level3" name="levels">
+                <label for="level3">Level 3 (B-splines)</label><br>
+                <input type="radio" id="level4" name="levels">
+                <label for="level4">Level 4 (NURBS)</label><br>
+                <button type="button" id="restart">Restart</button>
+                <p id="score"> Score: 0</p>
+            </div>
+            <div class="column">
+                <div id = "scene" > 
+                    <canvas id="canvas"></canvas>
+                </div>
+            </div>
         </div>
-        
-        <p id="score"> Score: 0</p>
     </body>
 </html>
