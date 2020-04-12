@@ -1,6 +1,7 @@
 import * as bezier from "./bezier.js";
 import * as splines from "./b-splines.js";
 import * as geometry from "./geometry.js";
+import * as subdivision from "./subdivision.js";
 
 var canvas = document.getElementById("canvas");
 fitToContainer(canvas);
@@ -46,6 +47,13 @@ document.getElementById("level3").onclick = function() {
 document.getElementById("level4").onclick = function() {
     if(level != 4) {
         level = 4;
+        restart();
+    }
+}
+
+document.getElementById("level5").onclick = function() {
+    if(level != 5) {
+        level = 5;
         restart();
     }
 }
@@ -196,6 +204,9 @@ function draw() {
             break;
         case 4: 
             intersects = splines.drawSpline(points,ctx,true);
+            break;
+        case 5: 
+            intersects = subdivision.drawSubdivision(points,ctx);
             break;
     }
     if(intersects) {
