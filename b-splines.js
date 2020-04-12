@@ -3,7 +3,6 @@ var k = 4;
 
 function drawSpline(points, ctx, isNURBS) {
     var n = points.length - 1;
-    var intersects = false;
     var lines=[];
     var head = points.pop();
     geometry.DrawLine(ctx, points[points.length - 1], head);

@@ -16,6 +16,10 @@ function Line(A, B) {
     this.B = B;
 }
 
+function addScaled(original, scale, another) {
+    return new Point(original.x + scale*another.x, original.y + scale*another.y, original.w + scale*another.w);
+}
+
 function length(A, B) {
     return Math.sqrt((B.x - A.x)*(B.x - A.x) + (B.y - A.y)*(B.y - A.y));
 }
@@ -68,4 +72,4 @@ function atLeastOneLineIntersect(lines, line) {
     return false;
 }
 
-export {DrawLine, Point, length, isClose, Line, atLeastOneLineIntersect, linesIntersect}
+export {DrawLine, Point, length, isClose, Line, atLeastOneLineIntersect, linesIntersect, addScaled}
