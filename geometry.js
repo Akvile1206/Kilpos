@@ -72,4 +72,4 @@ function atLeastOneLineIntersect(lines, line) {
     return false;
 }
 
-export {DrawLine, Point, length, isClose, Line, atLeastOneLineIntersect, linesIntersect, addScaled}
+export {DrawLine, Point, length, isClose, Line, atLeastOneLineIntersect, linesIntersect, addScaled, reflect}

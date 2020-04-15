@@ -1,6 +1,6 @@
 import * as geometry from "./geometry.js";
 
-function drawSubdivision(points, ctx) {
+function drawSubdivision(points, ctx, isQuad) {
     var lines=[];
     var head = points.pop();
     geometry.DrawLine(ctx, points[points.length - 1], head);
@@ -12,11 +12,12 @@ function drawSubdivision(points, ctx) {
         }
         return geometry.atLeastOneLineIntersect(lines, headLine);
     }
+    
     // var kernel = [1/4, 3/4, 3/4, 1/4]; Chaikin
     var kernel = [1/8, 4/8, 6/8, 4/8, 1/8]; //Catmull-Clark
-    var new_points = subdivide(points, kernel);
-    new_points = subdivide(new_points, kernel);
-    new_points = subdivide(new_points, kernel);
+    var new_points = subdivideQuad(points, kernel);
+    new_points = subdivideQuad(new_points, kernel);
+    new_points = subdivideQuad(new_points, kernel);
 
     for(var i=0; i<new_points.length-1; i++) {
         lines.push(new geometry.Line(new_points[i], new_points[i+1]));
@@ -25,7 +26,7 @@ function drawSubdivision(points, ctx) {
     return geometry.atLeastOneLineIntersect(lines, headLine);
 }
 
-function subdivide(points, kernel) {
+function subdivideQuad(points, kernel) {
     var new_points = [];
     new_points.push(points[0]);
     var n = points.length - 1;
