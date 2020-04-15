@@ -11,7 +11,7 @@ You can launch the game by starting a http server in the directory that you clon
 * d key - move head clockwise
 #### The rules:
 1. Eat red dots to grow bigger.
-2. Try not to run into yourself or make loops (¯\_(ツ)_/¯).
+2. Try not to run into yourself or make loops (¯\\_(ツ)_/¯).
 3. Proceed to next level when you feel that you have grown enough. 
 
 ### Featured curves:
